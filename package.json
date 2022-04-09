@@ -1,0 +1,15 @@
+{
+	"name": "kdecole-toolbox",
+	"version": "1.0.0",
+	"license": "ISC",
+	"author": {
+		"name": "Maël Gangloff",
+		"email": "contact@maelgangloff.fr"
+	},
+	"dependencies": {
+		"dotenv": "^10.0.0",
+		"ejs": "^3.1.6",
+		"express": "^4.17.1",
+		"kdecole-api": "^1.2.9"
+	}
+}

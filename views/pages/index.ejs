@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <title>Boîte à outils mobilité Skolengo</title>
+    <style>
+        @media print {
+            .noprint { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-2">
+        <h1>Boîte à outils mobilité Skolengo</h1>
+        <div class="row noprint">
+            <div class="col-sm">
+                <div class="jumbotron pb-1 pt-3 mb-3">
+                    <div class="form-group row">
+                        <label for="ent" class="col-sm-4 col-form-label">🚧 Projet</label>
+                        <select id="ent" class="form-control col-sm-8">
+                            <% entList.forEach(ent => { %><option><%= ent %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                </div>
+                <div class="jumbotron pb-1 mb-3 pt-3">
+                    <h2>Authentification</h2>
+                    <div class="form-group row">
+                        <label for="token" class="col-sm-3 col-form-label">🔑 Jeton d'accès</label>
+                        <input type="password" class="form-control col-sm-3" id="token" autofocus>
+                        <button class="btn btn-secondary col-sm-3 ml-2 mr-1" id="testConnection">Se connecter</button>
+                        <button class="btn btn-danger col-sm-2 js-ifconnected" tabindex="-1" id="revoke">​Révoquer</button>
+                    </div>
+                    <div class="form-group row">
+                        <label for="ent" class="col-sm-4 col-form-label">🧑 Élève cible</label>
+                        <select id="idEleve" class="form-control col-sm-7 js-ifconnected"></select>
+                    </div>
+                </div>
+                <div class="jumbotron pt-3 pb-1 mb-0">
+                    <div class="row">
+                        <label class="col-form-label col-sm-5">📅 Emploi du temps <div class="badge badge-info ml-1">iCal</div></label>
+                        <input type="number" id="weeks" class="form-control col-sm-3 js-ifconnected" title="Nombre de semaines." min="0" value="2" max="2" width="10px" placeholder="Semaines">
+                        <button class="btn btn-primary ml-2 col-sm-3 js-ifconnected" id="getIcalendarButton">iCalendar</button>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <label class="col-form-label col-sm-5">📚 Relevé des notes <div class="badge badge-info ml-1">CSV</div></label>
+                        <button class="btn btn-primary mr-4 js-ifconnected" id="getDevoirs">Devoirs</button>
+                        <button class="btn btn-primary mr-4 js-ifconnected" id="getMatieres">Matières</button>
+                        <button class="btn btn-primary js-ifconnected" id="getTrimestres">Trimestres</button>
+                        <br>
+                        <div class="form-check">
+                            <input type="checkbox" id="includeNN" class="form-check-input js-ifconnected" title="Inclure les devoirs non-notés.">
+                            <label for="includeNN" class="form-check-label">Inclure les devoirs non-notés</label>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <label class="col-form-label col-sm-4">📝 Travail à faire <div class="badge badge-info ml-1">CSV</div></label>
+                        <input type="date" id="notBeforeTaf" title="Ne pas inclure les devoirs avant cette date." class="form-control col-sm-4">
+                        <button class="btn btn-primary ml-2 col-sm-3 js-ifconnected" id="getTaf">Travail à faire</button>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <label class="col-form-label col-sm-4">🔴 Absences <div class="badge badge-info ml-1">CSV</div></label>
+                        <button class="btn btn-primary ml-2 col-sm-5 js-ifconnected" id="getAbsences">Absences</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="alert alert-warning"><strong>⚠️ Ne communiquez jamais votre jeton à un tier. Il vous est strictement personnel. Si vous pensez que votre jeton a fuité, révoquez-le immédiatement.</strong></div>
+                <div class="jumbotron pt-3 mb-3">
+                    <h2>Obtenir un jeton</h2>
+                    <br>
+                    <div class="form-group row">
+                        <label for="username" class="col-sm-5 col-form-label">Nom d'utilisateur</label>
+                        <input type="text" class="form-control col-sm-7" id="username" autocomplete="off" placeholder="Identifiant">
+                    </div>
+                    <div class="form-group row">
+                        <label for="tempPassword" class="col-sm-5 col-form-label">Mot de passe temporaire</label>
+                        <input type="password" class="form-control col-sm-7" id="tempPassword" placeholder="Mot de passe à usage unique">
+                        <small class="text-muted">Pour obtenir ces informations, rendez-vous dans l'onglet <b>Application mobile</b> de votre profil ENT.</small>
+                    </div>
+                    <button class="btn btn-success float-right" id="getToken">Obtenir un jeton</button>
+                </div>
+                <div class="jumbotron pt-2 mb-0">
+                    <h2>Graphiques</h2>
+                    <button class="btn btn-warning btn-block btn-lg js-ifconnected" id="loadChartMatieres">🕸️ Matières</button>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row" id="trimestresChartContainerHeaders" style="display: none;">
+            <h3 class="col-sm">Premier trimestre</h3>
+            <h3 class="col-sm">Second trimestre</h3>
+            <h3 class="col-sm">Troisième trimestre</h3>
+        </div>
+        <div class="row" id="trimestresChartContainer"></div>
+        
+    </div>
+    <script src="https://code.jquery.com/jquery-latest.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer>
+        $('.js-ifconnected').prop('disabled', true)
+
+        const $token = $('#token')
+        const $ent = $('#ent')
+        const $username = $('#username')
+        const $tempPassword = $('#tempPassword')
+        const $idEleve = $('#idEleve')
+        const $weeks = $('#weeks')
+        const $notBeforeTaf = $('#notBeforeTaf')
+        const $container = $('#trimestresChartContainer')
+        const $containerHeaders = $('#trimestresChartContainerHeaders')
+
+
+        if(sessionStorage.getItem('token') !== null) $token.val(sessionStorage.getItem('token'))
+        if(sessionStorage.getItem('projet') !== null) $ent.val(sessionStorage.getItem('projet'))
+
+        const getDateFormatted = now => now.getFullYear()+'-'+(('0' + (now.getMonth() + 1)).slice(-2))+'-'+(('0' + now.getDate()).slice(-2))
+        
+        $notBeforeTaf.val(getDateFormatted(new Date()))
+
+        $('#token').keyup(e => e.keyCode === 13 && $('#testConnection').click())
+        $('#idEleve').on('change', e => $container.empty() && $containerHeaders.css('display', 'none'))
+
+        const acceptsCSV = {text: 'text/csv'}
+        const acceptsICS = {text: 'text/calendar'}
+
+        /**
+         * @param {string} url
+         * @param {object} data Les données à envoyer
+         * @param {(data: any) => void} callback
+         * @param {object} accepts Le type de retour
+         * @param {string} dataType Le type de retour à parser
+         * @param {string} type Type de requête
+         */
+        function callApi(url, data, callback, accepts, dataType, type = 'POST') {
+            return $.ajax({
+                url,
+                type,
+                data: JSON.stringify(data),
+                accepts,
+                contentType: 'application/json; charset=utf-8',
+                dataType,
+                success: data => {
+                    callback(data)
+                },
+                error: () => alert('Accès refusé.')
+            })
+        }
+
+        /**
+         * @param {any} data
+         * @param {string} fileName
+         */
+        function downloadData(data, fileName) {
+            const link = document.createElement('a')
+            link.download = fileName
+            link.href = window.URL.createObjectURL(new Blob([data], {type: 'text/csv'}))
+            link.click()
+        }
+
+        $('#revoke').on('click', e => {
+            const ent = $ent.val()
+            const token = $token.val()
+            if(!confirm('Voulez-vous vraiment révoquer ce jeton ?')) return
+            e.target.disabled = true
+            callApi('/api/revoke', {ent, token}, data => {
+                if(data.ok){
+                    alert('Jeton correctement révoqué')
+                    location.reload()
+                    sessionStorage.removeItem('token')
+                } else alert('Une erreur est survenue')
+            }).always(() => e.target.disabled = false)
+        })
+
+        $('#testConnection').on('click', e => {
+            const ent = $ent.val()
+            const token = $token.val()
+            if(token.trim() === '') return alert('Un jeton doit être spécifié')
+            e.target.disabled = true
+            $('#notif').remove()
+            callApi('/api', {ent, token}, data => {
+                alert(`Jeton valide, connecté en tant que ${data.nom}`)
+                sessionStorage.setItem('token', token)
+                sessionStorage.setItem('projet', ent)
+                $('.js-ifconnected').prop('disabled', false)
+                $token.prop('disabled', true)
+                $ent.prop('disabled', true)
+                if(data.eleves.length !== 0) $idEleve.append(data.eleves.map(e => `<option value="${e.uid}">${e.nom} - UID: ${e.uid}</option>`))
+                else $idEleve.append(`<option value="">${data.nom}</option>`)
+            }).error(() => e.target.disabled = false)
+        })
+
+        $('#getToken').on('click', e => {
+            const ent = $ent.val()
+            const username = $username.val()
+            const tempPassword = $tempPassword.val()
+            if(username === '' || tempPassword === '') return alert('Tous les champs doivent être remplis.')
+            e.target.disabled = true
+            $('#notif').remove()
+            callApi('/api/activation', {ent, username, tempPassword}, data => {
+                const alert = document.createElement('div')
+                alert.className = `alert alert-success`
+                alert.id = 'notif'
+                alert.innerText = `Token: ${data.token}`
+                document.querySelector('.container-fluid').prepend(alert)
+            })
+            e.target.disabled = false
+        })
+
+        $('#getIcalendarButton').on('click', e => {
+            e.target.disabled = true
+            const ent = $ent.val()
+            const token = $token.val()
+            const idEleve = $idEleve.val()
+            const weeks = parseInt($weeks.val())
+            callApi('/api/calendar', {ent, token, weeks: isNaN(weeks) ? 2 : weeks, idEleve}, data => downloadData(data, `calendar-${idEleve}.ics`), acceptsICS, 'text').always(() => e.target.disabled = false)
+        })
+
+        $('#getDevoirs').on('click', e => {
+            e.target.disabled = true
+            const ent = $ent.val()
+            const token = $token.val()
+            const idEleve = $idEleve.val()
+            const includeNN = $('#includeNN').is(':checked')
+            callApi('/api/releve/devoirs', {ent, token, idEleve}, data => downloadData(includeNN ? data : data.replace(/\n.+,.+,.+,.+,.+,.+,,.+/g, ''), `devoirs-${idEleve}.csv`), acceptsCSV, 'text').always(() => e.target.disabled = false)
+        })
+
+        $('#getMatieres').on('click', e => {
+            e.target.disabled = true
+            const ent = $ent.val()
+            const token = $token.val()
+            const idEleve = $idEleve.val()
+            callApi('/api/releve/matieres', {ent, token, idEleve}, data => downloadData(data, `matieres-${idEleve}.csv`), acceptsCSV, 'text').always(() => e.target.disabled = false)
+        })
+
+        $('#getTrimestres').on('click', e => {
+            e.target.disabled = true
+            const ent = $ent.val()
+            const token = $token.val()
+            const idEleve = $idEleve.val()
+            callApi('/api/releve/trimestres', {ent, token, idEleve}, data => downloadData(data, `trimestres-${idEleve}.csv`), acceptsCSV, 'text').always(() => e.target.disabled = false)
+        })
+
+        $('#getTaf').on('click', e => {
+            e.target.disabled = true
+            const ent = $ent.val()
+            const token = $token.val()
+            const idEleve = $idEleve.val()
+            const notBefore = $notBeforeTaf.val()
+            callApi('/api/taf', {ent, token, idEleve, notBefore: notBefore === '' ? new Date().toISOString() : new Date(notBefore).toISOString()}, data => downloadData(data, `taf-${idEleve}.csv`), acceptsCSV, 'text').always(() => e.target.disabled = false)
+        })
+
+        $('#getAbsences').on('click', e => {
+            e.target.disabled = true
+            const ent = $ent.val()
+            const token = $token.val()
+            const idEleve = $idEleve.val()
+            callApi('/api/absences', {ent, token, idEleve}, data => downloadData(data, `absences-${idEleve}.csv`), acceptsCSV, 'text').always(() => e.target.disabled = false)
+        })
+
+        $('#loadChartMatieres').on('click', e => {
+            e.target.disabled = true
+            const ent = $ent.val()
+            const token = $token.val()
+            const idEleve = $idEleve.val()
+            callApi('/api/releve', {ent, token, idEleve}, data => {
+                const [t1, t2, t3] = data.sort((t1, t2) => t1.idPeriode < t2.idPeriode)
+                function createChartTrimestre(canvas, trimestre) {
+                    new Chart(canvas, {
+                    type: 'radar',
+                    data: {
+                        labels: trimestre.matieres.map(m => m.matiereLibelle),
+                        datasets: [
+                            {
+                                label: 'Moyenne élève',
+                                data: trimestre.matieres.map(m => m.moyenneEleve),
+                                fill: true,
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderColor: 'rgb(255, 99, 132)',
+                                pointRadius: 5,
+                                pointHoverRadius: 5,
+                                pointBackgroundColor: 'rgb(255, 99, 132)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgb(255, 99, 132)'
+                            },
+                            {
+                                label: 'Moyenne classe',
+                                data: trimestre.matieres.map(m => m.moyenneClasse),
+                                fill: true,
+                                backgroundColor: 'rgba(0, 99, 132, 0.2)',
+                                borderColor: 'rgb(0, 99, 132)',
+                                pointRadius: 5,
+                                pointHoverRadius: 5,
+                                pointBackgroundColor: 'rgb(0, 99, 132)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgb(0, 99, 132)'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        elements: { line: { borderWidth: 3 } },
+                        scales: {
+                            r: {
+                                angleLines: { display: false },
+                                suggestedMin: 0,
+                                suggestedMax: 20
+                            }
+                        }
+                    }
+                })
+                }
+                
+                $containerHeaders.css('display', 'flex')
+                $container.empty()
+                data.forEach(t => {
+                    $container.append(`<div class="col-sm" style="width: 33%;"><canvas id="trimestre-${t.idPeriode}"></canvas></div>`)
+                    createChartTrimestre(document.getElementById(`trimestre-${t.idPeriode}`), t)
+                })
+            }, {json: 'application/json'}, 'json').always(() => e.target.disabled = false)
+        })
+    </script>
+</body>
+</html>
