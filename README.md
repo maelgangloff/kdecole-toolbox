@@ -8,6 +8,15 @@ Boîte à outils pour télécharger l'ensemble des notes, absences, travaux à f
 
 1. Installer Node.js
 2. Cloner le dépôt
-3. Télécharger les dépendances: `npm install --no-dev`
-4. Démarrer le serveur: `node index.js`
-5. Se rendre à l'adresse http://localhost:8080/ depuis votre navigateur
+```shell
+git clone https://github.com/maelgangloff/kdecole-toolbox
+```
+3. Télécharger les dépendances
+```shell
+npm install --no-dev
+```
+4. Démarrer le serveur
+```shell
+node index.js
+```
+5. Se rendre à l'adresse http://localhost:8080/ depuis un navigateur

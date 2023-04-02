@@ -383,10 +383,10 @@ jake@^10.8.5:
     filelist "^1.0.1"
     minimatch "^3.0.4"
 
-kdecole-api@^1.3.6:
-  version "1.3.7"
-  resolved "https://registry.yarnpkg.com/kdecole-api/-/kdecole-api-1.3.7.tgz#65e9ff1c52799e91649fea7292f6817dcd74ebfc"
-  integrity sha512-4NTZXwZ6yX9BUeOdrWHd+sknDJZ740HaB50BdOIjBgbSEBahiG4qFbeuVULyHd1CJ026cZf7g1UdqDroHmYkmQ==
+kdecole-api@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/kdecole-api/-/kdecole-api-1.4.1.tgz#df84540ae7f827f562a3f17372ed3a05746f959e"
+  integrity sha512-Zrf6rxMX7L0MXJaAUjVYfq/U4QU38wfZkJTqKjgnUSarhVvKrV1CbOdGgOkga1bf2cAtBBSAj+eg1WCfzda5Kw==
   dependencies:
     axios "^0.27.2"
     yargs "^17.0.1"

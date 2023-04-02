@@ -12,7 +12,7 @@
 </head>
 <body>
     <div class="container-fluid mt-2">
-        <h1>Boîte à outils mobilité Skolengo</h1>
+        <a class="text-reset" href="https://github.com/maelgangloff/kdecole-toolbox"><h1>Boîte à outils mobilité Skolengo</h1></a>
         <div class="row noprint">
             <div class="col-sm">
                 <div class="jumbotron pb-1 pt-3 mb-3">
@@ -69,9 +69,9 @@
                 </div>
             </div>
             <div class="col-sm">
-                <div class="alert alert-warning"><strong>⚠️ Ne communiquez jamais votre jeton à un tier. Il vous est strictement personnel. Si vous pensez que votre jeton a fuité, révoquez-le immédiatement.</strong></div>
+                <div class="alert alert-warning"><strong>🚨 ATTENTION: Ne communiquez jamais votre jeton à un tier. Il vous est strictement personnel. Si vous pensez que votre jeton a fuité, révoquez-le immédiatement.</strong></div>
                 <div class="jumbotron pt-3 mb-3">
-                    <h2>Obtenir un jeton</h2>
+                    <h2>🔑 Obtenir un jeton</h2>
                     <br>
                     <div class="form-group row">
                         <label for="username" class="col-sm-5 col-form-label">Nom d'utilisateur</label>
@@ -85,7 +85,7 @@
                     <button class="btn btn-success float-right" id="getToken">Obtenir un jeton</button>
                 </div>
                 <div class="jumbotron pt-2 mb-0">
-                    <h2>Graphiques</h2>
+                    <h2>🕸️ Représentations graphiques</h2>
                     <button class="btn btn-warning btn-block btn-lg js-ifconnected" id="loadChartMatieres">🕸️ Matières</button>
                 </div>
             </div>
@@ -268,7 +268,7 @@
             const token = $token.val()
             const idEleve = $idEleve.val()
             callApi('/api/releve', {ent, token, idEleve}, data => {
-                const [t1, t2, t3] = data.sort((t1, t2) => t1.idPeriode < t2.idPeriode)
+                const [t1, t2, t3] = data.sort((t1, t2) => t1.idPeriode > t2.idPeriode)
                 function createChartTrimestre(canvas, trimestre) {
                     new Chart(canvas, {
                     type: 'radar',
