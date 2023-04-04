@@ -32,7 +32,7 @@ app.post('/api', async (_req, res) => {
 
 
 app.get('/', (_req, res) => res.render('pages/index', {
-        entList: Object.keys(ApiUrl).filter(x => Object.keys(ApiVersion).includes(x)).map(x => x.replace(/PROD_/g, '').replace(/_/g, ' '))
+        entList: Object.keys(ApiUrl).filter(x => Object.keys(ApiVersion).includes(x))
 }))
 
 app.post('/api/activation', async (req, res) => {
