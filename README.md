@@ -1,4 +1,7 @@
 # kdecole-toolbox
+<p align="center">
+  <img src="https://github.com/The-Rabbit-Team/.github/blob/master/banners/kdecole-toolbox.png?raw=true" />
+</p>
 Boîte à outils pour télécharger l'ensemble des notes, absences, travaux à faire d'un élève au format CSV et l'emploi du temps au format iCalendar.
 
 ## Exemple
